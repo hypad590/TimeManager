@@ -1,5 +1,6 @@
 package Model;
 
+import Entities.AnotherEntity;
 import Entities.WorkEntity;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -90,12 +91,15 @@ public class TimeTrackingApp extends Application {
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setTitle("Добавить сотрудника");
 
+        dialogStage.setWidth(525);
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(20));
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
         DatePicker datePicker = new DatePicker();
+        DatePicker datePicker1 = new DatePicker();
+        DatePicker datePicker2 = new DatePicker();
 
         TextField startTimeField = new TextField();
         TextField endTimeField = new TextField();
@@ -126,8 +130,10 @@ public class TimeTrackingApp extends Application {
         gridPane.add(datePicker, 1, 0);
         gridPane.add(new Label("Начало:"), 0, 1);
         gridPane.add(startTimeField, 1, 1);
+        gridPane.add(datePicker1,2,1);
         gridPane.add(new Label("Конец:"), 0, 2);
         gridPane.add(endTimeField, 1, 2);
+        gridPane.add(datePicker2,2,2);
 
         Label errorLabel = new Label();
         errorLabel.setTextFill(Color.RED);
@@ -135,7 +141,7 @@ public class TimeTrackingApp extends Application {
 
         Button addButton = new Button("Добавить");
         addButton.setOnAction(event -> {
-            LocalDate date = datePicker.getValue();
+            LocalDate date = datePicker.getValue(); LocalDate date1 = datePicker1.getValue();
             if (date == null) {
                 errorLabel.setText("Invalid Data");
                 return;
@@ -150,9 +156,11 @@ public class TimeTrackingApp extends Application {
             String endTime = endTimeField.getText();
 
             WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime);
+            AnotherEntity anotherEntity = new AnotherEntity(date,date1, startTime,endTime);
+
             tableView.getItems().add(newWorkEntity);
             try {
-                insertDataIntoDB(newWorkEntity);
+                insertDataIntoDB(anotherEntity);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -208,12 +216,12 @@ public class TimeTrackingApp extends Application {
             preparedStatement.executeUpdate();
         }
     }
-    private void insertDataIntoDB(WorkEntity workEntity) throws SQLException {
+    private void insertDataIntoDB(AnotherEntity workEntity) throws SQLException {
         String sql = "INSERT INTO work_entries (date, start_time, end_time) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Проверяем, что дата не null, перед вызовом toString()
-            if (workEntity.getDate() != null) {
-                preparedStatement.setString(1, workEntity.getDate().toString());
+            if (AnotherEntity.getDate1() != null) {
+                preparedStatement.setString(1, AnotherEntity.getDate1().toString());
             } else {
                 preparedStatement.setString(1, null); // или используйте другое значение по умолчанию
             }
