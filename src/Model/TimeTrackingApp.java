@@ -1,14 +1,15 @@
 package Model;
 
 import javafx.application.Application;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import Entities.*;
 
@@ -24,6 +26,9 @@ public class TimeTrackingApp extends Application {
     private static TableView<WorkEntity> tableView;
     private ContextMenu currentContextMenu = null;
     private static Label totalLabel;
+    private static  DatePicker datePicker99;
+    private static Stage primaryStage;
+    private static LocalDate selectedDate;
 
     @Override
     public void start(Stage primaryStage) {
@@ -42,6 +47,10 @@ public class TimeTrackingApp extends Application {
 
         totalLabel = new Label();
         root.setBottom(totalLabel);
+
+        Button archiveButton = new Button("Архив");
+        archiveButton.setOnAction(event -> showArchiveDialog());
+        root.setRight(archiveButton);
 
         TableColumn<WorkEntity, LocalDate> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -326,6 +335,59 @@ public class TimeTrackingApp extends Application {
                 "path TEXT,"+
                 "exit TEXT)";
         statement.executeUpdate(sql);
+    }
+    private static void loadDataFromArchive(String sel){
+        System.out.println(sel);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        try (Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM work_entries")) {
+            tableView.getItems().clear();
+            while (resultSet.next()) {
+                String dateString = resultSet.getString("date");
+                if (dateString != null) {
+                    LocalDate date = LocalDate.parse(dateString, formatter);
+                    String[] huy = String.valueOf(date).split("-");
+                    String[] huy2 = String.valueOf(sel).split("-");
+
+                    String startTime = resultSet.getString("start_time");
+                    String endTime = resultSet.getString("end_time");
+                    String total = resultSet.getString("total");
+                    String path = resultSet.getString("path");
+                    String exit = resultSet.getString("exit");
+
+
+                    if((huy[0] + huy[1]).equals(huy2[0] + huy2[1])){
+                        tableView.getItems().add(new WorkEntity(date, startTime, endTime, total, path, exit));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        totalLabel.setText(totalSum());
+    }
+    private void showArchiveDialog() {
+        Stage dialogStage = new Stage();
+        dialogStage.initOwner(primaryStage);
+        dialogStage.setTitle("Выберите месяц");
+
+        DatePicker monthPicker = new DatePicker();
+
+        VBox vbox = new VBox(monthPicker);
+
+        Button selectButton = new Button("Выбрать");
+        selectButton.setOnAction(event -> {
+            LocalDate selectedDate = LocalDate.from(monthPicker.getValue());
+            if (selectedDate != null) {
+                loadDataFromArchive(String.valueOf(selectedDate));
+            }
+            dialogStage.close();
+        });
+
+        VBox dialogVBox = new VBox(vbox, selectButton);
+        Scene dialogScene = new Scene(dialogVBox, 300, 200);
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
     }
     private static String totalSum(){
         float total = 0.0f;
