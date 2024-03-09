@@ -11,15 +11,28 @@ public class AnotherEntity{
     private final SimpleStringProperty startTime;
     private final SimpleStringProperty endTime;
     private static  SimpleObjectProperty<LocalDate> date2 = null;
+    private final SimpleStringProperty total;
 
-    public AnotherEntity(LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime) {
+    public AnotherEntity(LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime, String total) {
 
-        AnotherEntity.date = new SimpleObjectProperty<>(date);
+        this.date = new SimpleObjectProperty<>(date);
         AnotherEntity.date1 = new SimpleObjectProperty<>(date1);
         AnotherEntity.date2 = new SimpleObjectProperty<>(date2);
         this.startTime = new SimpleStringProperty(startTime);
         this.endTime = new SimpleStringProperty(endTime);
+        this.total = new SimpleStringProperty(total);
 
+    }
+    public String getTotal() {
+        return total.get();
+    }
+
+    public SimpleStringProperty totalProperty() {
+        return total;
+    }
+
+    public void setTotal(String total) {
+        this.total.set(total);
     }
 
     public static LocalDate getDate1() {

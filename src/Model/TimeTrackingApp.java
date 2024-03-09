@@ -14,12 +14,12 @@ import javafx.stage.Stage;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class TimeTrackingApp extends Application {
     private static Connection connection;
     private static TableView<WorkEntity> tableView;
-    private ContextMenu contextMenu;
     private ContextMenu currentContextMenu = null;
 
     @Override
@@ -46,9 +46,13 @@ public class TimeTrackingApp extends Application {
         TableColumn<WorkEntity, String> endColumn = new TableColumn<>("Конец");
         endColumn.setCellValueFactory(cellData -> cellData.getValue().endTimeProperty());
 
+        TableColumn<WorkEntity, String> totalColumn = new TableColumn<>("Всего");
+        totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalProperty());
+
         tableView.getColumns().add(dateColumn);
         tableView.getColumns().add(startColumn);
         tableView.getColumns().add(endColumn);
+        tableView.getColumns().add(totalColumn);
 
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:work_time.db");
@@ -75,11 +79,12 @@ public class TimeTrackingApp extends Application {
                     LocalDate date = LocalDate.parse(dateString, formatter);
                     String startTime = resultSet.getString("start_time");
                     String endTime = resultSet.getString("end_time");
+                    String total = resultSet.getString("total");
                     for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
                         System.out.print(resultSet.getMetaData().getColumnName(i) + ": " + resultSet.getString(i) + ", ");
                     }
                     System.out.println();
-                    tableView.getItems().add(new WorkEntity(date, startTime, endTime));
+                    tableView.getItems().add(new WorkEntity(date, startTime, endTime, total));
                 }
             }
         } catch (SQLException e) {
@@ -175,8 +180,9 @@ public class TimeTrackingApp extends Application {
             String startTime = startTimeField.getText();
             String endTime = endTimeField.getText();
 
-            WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime);
-            AnotherEntity anotherEntity = new AnotherEntity(date,date1,date2, startTime,endTime);
+            String total = calculate(date1,startTime,date2,endTime);
+            WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime, total);
+            AnotherEntity anotherEntity = new AnotherEntity(date,date1,date2, startTime,endTime,total);
 
             tableView.getItems().add(newWorkEntity);
             try {
@@ -193,6 +199,22 @@ public class TimeTrackingApp extends Application {
         Scene dialogScene = new Scene(gridPane, 300, 200);
         dialogStage.setScene(dialogScene);
         dialogStage.show();
+    }
+    private String calculate(LocalDate date1, String startTime, LocalDate date2, String endTime){
+        long startUnix = date1.toEpochDay() * 86400 + LocalTime.parse(startTime).toSecondOfDay();
+        long endUnix = date2.toEpochDay() * 86400 + LocalTime.parse(endTime).toSecondOfDay();
+
+        float rawData = Math.abs(endUnix - startUnix);
+
+        int obj2 = (int) (Float.parseFloat("0."+String.valueOf(rawData/3600).split("\\.")[1]) * 60);
+
+        String rawDataStr = String.valueOf(obj2);
+
+        if (obj2 >= 0 && obj2 <= 9) {
+            rawDataStr = "0"+rawDataStr;
+        }
+
+        return (int) Math.floor(rawData / 3600) + ":" + rawDataStr;
     }
     private void setupContextMenu() {
         tableView.setRowFactory(tableView -> {
@@ -238,7 +260,7 @@ public class TimeTrackingApp extends Application {
         }
     }
     private void insertDataIntoDB(AnotherEntity workEntity) throws SQLException {
-        String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time, total) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Проверяем, что дата не null, перед вызовом toString()
             if(AnotherEntity.getDate() != null){
@@ -260,6 +282,7 @@ public class TimeTrackingApp extends Application {
             }
             preparedStatement.setString(4, workEntity.getStartTime());
             preparedStatement.setString(5, workEntity.getEndTime());
+            preparedStatement.setString(6,workEntity.getTotal());
             preparedStatement.executeUpdate();
         }
     }
@@ -272,7 +295,8 @@ public class TimeTrackingApp extends Application {
                 "date1 TEXT," +
                 "date2 TEXT," +
                 "start_time TEXT," +
-                "end_time TEXT)";
+                "end_time TEXT,"+
+                "total TEXT)";
         statement.executeUpdate(sql);
     }
 
