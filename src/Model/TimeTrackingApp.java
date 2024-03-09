@@ -6,8 +6,6 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -17,13 +15,12 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TimeTrackingApp extends Application {
-    private Connection connection;
-    private TableView<WorkEntity> tableView;
+    private static Connection connection;
+    private static TableView<WorkEntity> tableView;
     private ContextMenu contextMenu;
+    private ContextMenu currentContextMenu = null;
 
     @Override
     public void start(Stage primaryStage) {
@@ -68,7 +65,7 @@ public class TimeTrackingApp extends Application {
         primaryStage.show();
     }
 
-    private void loadDataFromDB() throws SQLException {
+    private static void loadDataFromDB() throws SQLException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM work_entries")) {
@@ -78,6 +75,10 @@ public class TimeTrackingApp extends Application {
                     LocalDate date = LocalDate.parse(dateString, formatter);
                     String startTime = resultSet.getString("start_time");
                     String endTime = resultSet.getString("end_time");
+                    for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+                        System.out.print(resultSet.getMetaData().getColumnName(i) + ": " + resultSet.getString(i) + ", ");
+                    }
+                    System.out.println();
                     tableView.getItems().add(new WorkEntity(date, startTime, endTime));
                 }
             }
@@ -105,24 +106,27 @@ public class TimeTrackingApp extends Application {
         TextField endTimeField = new TextField();
 
         // Список для хранения сообщений об ошибках
-        List<String> errorMessages = new ArrayList<>();
+        final String[] errorMessages1 = new String[1];
+        final String[] errorMessages2 = new String[1];
 
         // Обработчик ввода для полей начала и конца
         startTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                startTimeField.setText(newValue.replaceAll("[^\\d]", ""));
-                errorMessages.add("Invalid Data");
-            } else {
-                errorMessages.remove("Invalid Data");
+            if(newValue.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")){
+                startTimeField.setText(newValue);
+                errorMessages1[0] = "";
+            }
+            else{
+                errorMessages1[0] = "Invalid Start Time Format";
             }
         });
 
         endTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                endTimeField.setText(newValue.replaceAll("[^\\d]", ""));
-                errorMessages.add("Invalid Data");
-            } else {
-                errorMessages.remove("Invalid Data");
+            if(newValue.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")){
+                endTimeField.setText(newValue);
+                errorMessages2[0] = "";
+            }
+            else{
+                errorMessages2[0] = "Invalid End Time Format";
             }
         });
 
@@ -136,19 +140,35 @@ public class TimeTrackingApp extends Application {
         gridPane.add(datePicker2,2,2);
 
         Label errorLabel = new Label();
+        Label errorLabel0 = new Label();
         errorLabel.setTextFill(Color.RED);
+        errorLabel0.setTextFill(Color.RED);
+
         gridPane.add(errorLabel, 1, 3);
+        gridPane.add(errorLabel0, 1, 4);
 
         Button addButton = new Button("Добавить");
         addButton.setOnAction(event -> {
             LocalDate date = datePicker.getValue(); LocalDate date1 = datePicker1.getValue();
+            LocalDate date2 = datePicker2.getValue();
             if (date == null) {
                 errorLabel.setText("Invalid Data");
                 return;
             }
 
-            if (!errorMessages.isEmpty()) {
-                errorLabel.setText(errorMessages.get(0)); // Отображаем первое сообщение об ошибке
+            if(errorMessages1[0] == null || errorMessages2[0] == null){
+                if(errorMessages1[0] == null){
+                    errorLabel.setText("Invalid Start Time format");
+                }
+                if(errorMessages2[0] == null){
+                    errorLabel0.setText("Invalid End Time format");
+                }
+                return;
+            }
+
+            if(!errorMessages1[0].isEmpty() || !errorMessages2[0].isEmpty()){
+                errorLabel.setText(errorMessages1[0]); // Отображаем первое сообщение об ошибке
+                errorLabel0.setText(errorMessages2[0]); // 2
                 return;
             }
 
@@ -156,7 +176,7 @@ public class TimeTrackingApp extends Application {
             String endTime = endTimeField.getText();
 
             WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime);
-            AnotherEntity anotherEntity = new AnotherEntity(date,date1, startTime,endTime);
+            AnotherEntity anotherEntity = new AnotherEntity(date1,date2, startTime,endTime);
 
             tableView.getItems().add(newWorkEntity);
             try {
@@ -175,36 +195,37 @@ public class TimeTrackingApp extends Application {
         dialogStage.show();
     }
     private void setupContextMenu() {
-        tableView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if (event.getButton() == MouseButton.SECONDARY) {
-                WorkEntity selectedItem = tableView.getSelectionModel().getSelectedItem();
+        tableView.setRowFactory(tableView -> {
+            final TableRow<WorkEntity> row = new TableRow<>();
+            final ContextMenu rowMenu = new ContextMenu();
+            final MenuItem deleteItem = new MenuItem("Удалить");
+
+            deleteItem.setOnAction(event -> {
+                WorkEntity selectedItem = row.getItem();
                 if (selectedItem != null) {
-                    // Проверяем, есть ли уже открытое контекстное меню
-                    if (contextMenu != null && contextMenu.isShowing()) {
-                        contextMenu.hide(); // Закрываем текущее меню
+                    try {
+                        deleteDataFromDB(selectedItem);
+                        tableView.getItems().remove(selectedItem);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
                     }
-
-                    contextMenu = new ContextMenu();
-
-                    MenuItem editItem = new MenuItem("Редактировать");
-                    editItem.setOnAction(e -> {
-                        // Реализуйте логику редактирования
-                    });
-
-                    MenuItem deleteItem = new MenuItem("Удалить");
-                    deleteItem.setOnAction(e -> {
-                        try {
-                            deleteDataFromDB(selectedItem);
-                            tableView.getItems().remove(selectedItem);
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    });
-
-                    contextMenu.getItems().addAll(editItem, deleteItem);
-                    contextMenu.show(tableView, event.getScreenX(), event.getScreenY());
                 }
-            }
+            });
+
+            rowMenu.getItems().add(deleteItem);
+
+            // Удалять предыдущее контекстное меню перед открытием нового
+            row.setOnContextMenuRequested(event -> {
+                if (!row.isEmpty()) {
+                    if (currentContextMenu != null) {
+                        currentContextMenu.hide();
+                    }
+                    rowMenu.show(tableView, event.getScreenX(), event.getScreenY());
+                    currentContextMenu = rowMenu;
+                }
+            });
+
+            return row;
         });
     }
     private void deleteDataFromDB(WorkEntity workEntity) throws SQLException {
@@ -223,7 +244,7 @@ public class TimeTrackingApp extends Application {
             if (AnotherEntity.getDate1() != null) {
                 preparedStatement.setString(1, AnotherEntity.getDate1().toString());
             } else {
-                preparedStatement.setString(1, null); // или используйте другое значение по умолчанию
+                preparedStatement.setString(1, null);
             }
             preparedStatement.setString(2, workEntity.getStartTime());
             preparedStatement.setString(3, workEntity.getEndTime());
@@ -235,13 +256,15 @@ public class TimeTrackingApp extends Application {
         Statement statement = connection.createStatement();
         String sql = "CREATE TABLE IF NOT EXISTS work_entries (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "date TEXT," +
+                "date1 TEXT," +
+                "date2 TEXT," +
                 "start_time TEXT," +
                 "end_time TEXT)";
         statement.executeUpdate(sql);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         launch(args);
+        loadDataFromDB();
     }
 }
