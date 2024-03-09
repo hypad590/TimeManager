@@ -176,7 +176,7 @@ public class TimeTrackingApp extends Application {
             String endTime = endTimeField.getText();
 
             WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime);
-            AnotherEntity anotherEntity = new AnotherEntity(date1,date2, startTime,endTime);
+            AnotherEntity anotherEntity = new AnotherEntity(date,date1,date2, startTime,endTime);
 
             tableView.getItems().add(newWorkEntity);
             try {
@@ -238,16 +238,28 @@ public class TimeTrackingApp extends Application {
         }
     }
     private void insertDataIntoDB(AnotherEntity workEntity) throws SQLException {
-        String sql = "INSERT INTO work_entries (date, start_time, end_time) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Проверяем, что дата не null, перед вызовом toString()
-            if (AnotherEntity.getDate1() != null) {
-                preparedStatement.setString(1, AnotherEntity.getDate1().toString());
-            } else {
-                preparedStatement.setString(1, null);
+            if(AnotherEntity.getDate() != null){
+                preparedStatement.setString(1,AnotherEntity.getDate().toString());
             }
-            preparedStatement.setString(2, workEntity.getStartTime());
-            preparedStatement.setString(3, workEntity.getEndTime());
+            else{
+                preparedStatement.setString(1,null);
+            }
+            if (AnotherEntity.getDate1() != null) {
+                preparedStatement.setString(2, AnotherEntity.getDate1().toString());
+            } else {
+                preparedStatement.setString(2, null);
+            }
+            if(AnotherEntity.getDate2() != null){
+                preparedStatement.setString(3, AnotherEntity.getDate2().toString());
+            }
+            else{
+                preparedStatement.setString(3,null);
+            }
+            preparedStatement.setString(4, workEntity.getStartTime());
+            preparedStatement.setString(5, workEntity.getEndTime());
             preparedStatement.executeUpdate();
         }
     }
@@ -256,6 +268,7 @@ public class TimeTrackingApp extends Application {
         Statement statement = connection.createStatement();
         String sql = "CREATE TABLE IF NOT EXISTS work_entries (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "date TEXT," +
                 "date1 TEXT," +
                 "date2 TEXT," +
                 "start_time TEXT," +

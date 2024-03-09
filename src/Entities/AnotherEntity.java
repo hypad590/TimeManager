@@ -7,14 +7,16 @@ import java.time.LocalDate;
 
 public class AnotherEntity{
     private static SimpleObjectProperty<LocalDate> date1 = null;
+    private static SimpleObjectProperty<LocalDate> date = null;
     private final SimpleStringProperty startTime;
     private final SimpleStringProperty endTime;
-    private final SimpleObjectProperty<LocalDate> date2;
+    private static  SimpleObjectProperty<LocalDate> date2 = null;
 
-    public AnotherEntity(LocalDate date1, LocalDate date2, String startTime, String endTime) {
+    public AnotherEntity(LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime) {
 
+        AnotherEntity.date = new SimpleObjectProperty<>(date);
         AnotherEntity.date1 = new SimpleObjectProperty<>(date1);
-        this.date2 = new SimpleObjectProperty<>(date2);
+        AnotherEntity.date2 = new SimpleObjectProperty<>(date2);
         this.startTime = new SimpleStringProperty(startTime);
         this.endTime = new SimpleStringProperty(endTime);
 
@@ -23,10 +25,12 @@ public class AnotherEntity{
     public static LocalDate getDate1() {
         return date1.get();
     }
+    public static LocalDate getDate(){return date.get(); }
 
     public SimpleObjectProperty<LocalDate> date1Property() {
         return date1;
     }
+    public SimpleObjectProperty<LocalDate> dateProperty() {return  date;}
 
     public String getStartTime() {
         return startTime.get();
@@ -44,7 +48,7 @@ public class AnotherEntity{
         return endTime;
     }
 
-    public LocalDate getDate2() {
+    public static LocalDate getDate2() {
         return date2.get();
     }
 
