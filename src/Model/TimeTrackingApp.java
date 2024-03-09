@@ -1,8 +1,8 @@
 package Model;
 
-import Entities.AnotherEntity;
-import Entities.WorkEntity;
 import javafx.application.Application;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +17,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import Entities.*;
 
 public class TimeTrackingApp extends Application {
     private static Connection connection;
@@ -44,7 +45,17 @@ public class TimeTrackingApp extends Application {
 
         TableColumn<WorkEntity, LocalDate> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-
+        dateColumn.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+                }
+            }
+        });
         TableColumn<WorkEntity, String> startColumn = new TableColumn<>("Начало");
         startColumn.setCellValueFactory(cellData -> cellData.getValue().startTimeProperty());
 
@@ -77,13 +88,12 @@ public class TimeTrackingApp extends Application {
         root.setCenter(tableView);
 
         setupContextMenu();
-        // Отображение сцены
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     private static void loadDataFromDB() throws SQLException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM work_entries")) {
             while (resultSet.next()) {
@@ -95,15 +105,11 @@ public class TimeTrackingApp extends Application {
                     String total = resultSet.getString("total");
                     String path = resultSet.getString("path");
                     String exit = resultSet.getString("exit");
-                    for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-                        System.out.print(resultSet.getMetaData().getColumnName(i) + ": " + resultSet.getString(i) + ", ");
-                    }
-                    System.out.println();
                     tableView.getItems().add(new WorkEntity(date, startTime, endTime, total, path, exit));
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Печать или логирование исключения
+            e.printStackTrace();
         }
         totalLabel.setText(totalSum());
     }
@@ -111,7 +117,7 @@ public class TimeTrackingApp extends Application {
     private void showAddEmplDialog() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
-        dialogStage.setTitle("Добавить сотрудника");
+        dialogStage.setTitle("Добавить");
 
         dialogStage.setWidth(525);
         GridPane gridPane = new GridPane();
@@ -128,11 +134,9 @@ public class TimeTrackingApp extends Application {
         TextField pathField = new TextField();
         TextField exitField = new TextField();
 
-        // Список для хранения сообщений об ошибках
         final String[] errorMessages1 = new String[1];
         final String[] errorMessages2 = new String[1];
 
-        // Обработчик ввода для полей начала и конца
         startTimeField.textProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")){
                 startTimeField.setText(newValue);
@@ -194,8 +198,8 @@ public class TimeTrackingApp extends Application {
             }
 
             if(!errorMessages1[0].isEmpty() || !errorMessages2[0].isEmpty()){
-                errorLabel.setText(errorMessages1[0]); // Отображаем первое сообщение об ошибке
-                errorLabel0.setText(errorMessages2[0]); // 2
+                errorLabel.setText(errorMessages1[0]);
+                errorLabel0.setText(errorMessages2[0]);
                 return;
             }
 
@@ -252,6 +256,7 @@ public class TimeTrackingApp extends Application {
                     try {
                         deleteDataFromDB(selectedItem);
                         tableView.getItems().remove(selectedItem);
+                        totalLabel.setText(totalSum());
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
@@ -260,7 +265,6 @@ public class TimeTrackingApp extends Application {
 
             rowMenu.getItems().add(deleteItem);
 
-            // Удалять предыдущее контекстное меню перед открытием нового
             row.setOnContextMenuRequested(event -> {
                 if (!row.isEmpty()) {
                     if (currentContextMenu != null) {
@@ -276,7 +280,6 @@ public class TimeTrackingApp extends Application {
 
         tableView.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                // Проверяем, отображается ли контекстное меню, и скрываем его
                 if (currentContextMenu != null && currentContextMenu.isShowing()) {
                     currentContextMenu.hide();
                     currentContextMenu = null;
@@ -287,7 +290,7 @@ public class TimeTrackingApp extends Application {
     private void deleteDataFromDB(WorkEntity workEntity) throws SQLException {
         String sql = "DELETE FROM work_entries WHERE date = ? AND start_time = ? AND end_time = ? AND path = ? AND exit = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, workEntity.getDate().toString());
+            preparedStatement.setString(1, workEntity.getFormattedDate());
             preparedStatement.setString(2, workEntity.getStartTime());
             preparedStatement.setString(3, workEntity.getEndTime());
             preparedStatement.setString(4,workEntity.getPath());
@@ -298,24 +301,9 @@ public class TimeTrackingApp extends Application {
     private void insertDataIntoDB(AnotherEntity workEntity) throws SQLException {
         String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time, total, path, exit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            // Проверяем, что дата не null, перед вызовом toString()
-            if(AnotherEntity.getDate() != null){
-                preparedStatement.setString(1,AnotherEntity.getDate().toString());
-            }
-            else{
-                preparedStatement.setString(1,null);
-            }
-            if (AnotherEntity.getDate1() != null) {
-                preparedStatement.setString(2, AnotherEntity.getDate1().toString());
-            } else {
-                preparedStatement.setString(2, null);
-            }
-            if(AnotherEntity.getDate2() != null){
-                preparedStatement.setString(3, AnotherEntity.getDate2().toString());
-            }
-            else{
-                preparedStatement.setString(3,null);
-            }
+            preparedStatement.setString(1, AnotherEntity.getFormattedDate());
+            preparedStatement.setString(2, AnotherEntity.getDate1() != null ? AnotherEntity.getDate1().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : null);
+            preparedStatement.setString(3, AnotherEntity.getDate2() != null ? AnotherEntity.getDate2().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : null);
             preparedStatement.setString(4, workEntity.getStartTime());
             preparedStatement.setString(5, workEntity.getEndTime());
             preparedStatement.setString(6,workEntity.getTotal());

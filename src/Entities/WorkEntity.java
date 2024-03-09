@@ -1,10 +1,9 @@
 package Entities;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class WorkEntity {
     private final SimpleObjectProperty<LocalDate> date;
@@ -14,9 +13,7 @@ public class WorkEntity {
     private final SimpleStringProperty exit;
     private final SimpleStringProperty path;
 
-    public WorkEntity(
-            LocalDate date, String startTime,String endTime,String total,String path, String exit
-    ) {
+    public WorkEntity(LocalDate date, String startTime, String endTime, String total, String path, String exit) {
         this.date = new SimpleObjectProperty<>(date);
         this.startTime = new SimpleStringProperty(startTime);
         this.endTime = new SimpleStringProperty(endTime);
@@ -24,6 +21,7 @@ public class WorkEntity {
         this.path = new SimpleStringProperty(path);
         this.exit = new SimpleStringProperty(exit);
     }
+
     public String getExit() {
         return exit.get();
     }
@@ -35,6 +33,7 @@ public class WorkEntity {
     public void setExit(String exit) {
         this.exit.set(exit);
     }
+
     public String getPath() {
         return path.get();
     }
@@ -46,6 +45,7 @@ public class WorkEntity {
     public void setPath(String path) {
         this.path.set(path);
     }
+
     public String getTotal() {
         return total.get();
     }
@@ -57,12 +57,13 @@ public class WorkEntity {
     public void setTotal(String total) {
         this.total.set(total);
     }
-    public LocalDate getDate() {
-        return date.get();
-    }
 
     public SimpleObjectProperty<LocalDate> dateProperty() {
         return date;
+    }
+
+    public LocalDate getDate() {
+        return date.get();
     }
 
     public String getStartTime() {
@@ -79,5 +80,9 @@ public class WorkEntity {
 
     public SimpleStringProperty endTimeProperty() {
         return endTime;
+    }
+
+    public String getFormattedDate() {
+        return getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 }

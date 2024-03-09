@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="WorkersInfo:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9eef3296-0f0b-4e8c-a4af-fa0e1b126b43" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entities/AnotherEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entities/AnotherEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entities/WorkEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entities/WorkEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entities/AnotherEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entities/AnotherEntity.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entities/WorkEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entities/WorkEntity.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" afterPath="$PROJECT_DIR$/work_time.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,9 +56,10 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;trusted.hosts&quot;
   }
 }</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

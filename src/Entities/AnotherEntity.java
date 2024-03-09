@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class AnotherEntity{
     private static SimpleObjectProperty<LocalDate> date1 = null;
@@ -20,7 +21,7 @@ public class AnotherEntity{
             LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime, String total,String path,
             String exit) {
 
-        this.date = new SimpleObjectProperty<>(date);
+        AnotherEntity.date = new SimpleObjectProperty<>(date);
         AnotherEntity.date1 = new SimpleObjectProperty<>(date1);
         AnotherEntity.date2 = new SimpleObjectProperty<>(date2);
         this.startTime = new SimpleStringProperty(startTime);
@@ -97,6 +98,9 @@ public class AnotherEntity{
 
     public SimpleObjectProperty<LocalDate> date2Property() {
         return date2;
+    }
+    public static String getFormattedDate() {
+        return getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 
 }
