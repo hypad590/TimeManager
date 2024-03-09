@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9eef3296-0f0b-4e8c-a4af-fa0e1b126b43" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Entities/AnotherEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entities/AnotherEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Entities/WorkEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Entities/WorkEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Entities/AnotherEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entities/AnotherEntity.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Entities/WorkEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Entities/WorkEntity.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" afterPath="$PROJECT_DIR$/work_time.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

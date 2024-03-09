@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -21,6 +22,7 @@ public class TimeTrackingApp extends Application {
     private static Connection connection;
     private static TableView<WorkEntity> tableView;
     private ContextMenu currentContextMenu = null;
+    private static Label totalLabel;
 
     @Override
     public void start(Stage primaryStage) {
@@ -36,6 +38,9 @@ public class TimeTrackingApp extends Application {
 
         root.setTop(addEmpl);
         root.setCenter(tableView);
+
+        totalLabel = new Label();
+        root.setBottom(totalLabel);
 
         TableColumn<WorkEntity, LocalDate> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -100,6 +105,7 @@ public class TimeTrackingApp extends Application {
         } catch (SQLException e) {
             e.printStackTrace(); // Печать или логирование исключения
         }
+        totalLabel.setText(totalSum());
     }
 
     private void showAddEmplDialog() {
@@ -208,7 +214,7 @@ public class TimeTrackingApp extends Application {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-
+            totalLabel.setText(totalSum());
             dialogStage.close();
         });
 
@@ -267,6 +273,16 @@ public class TimeTrackingApp extends Application {
 
             return row;
         });
+
+        tableView.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                // Проверяем, отображается ли контекстное меню, и скрываем его
+                if (currentContextMenu != null && currentContextMenu.isShowing()) {
+                    currentContextMenu.hide();
+                    currentContextMenu = null;
+                }
+            }
+        });
     }
     private void deleteDataFromDB(WorkEntity workEntity) throws SQLException {
         String sql = "DELETE FROM work_entries WHERE date = ? AND start_time = ? AND end_time = ? AND path = ? AND exit = ?";
@@ -322,6 +338,24 @@ public class TimeTrackingApp extends Application {
                 "path TEXT,"+
                 "exit TEXT)";
         statement.executeUpdate(sql);
+    }
+    private static String totalSum(){
+        float total = 0.0f;
+        if(!tableView.getItems().isEmpty()){
+            for(WorkEntity workEntity : tableView.getItems()) {
+                total += LocalTime.parse(workEntity.getTotal(), DateTimeFormatter.ofPattern("H:mm")).toSecondOfDay();
+            }
+            int obj2 = (int) (Float.parseFloat("0." + String.valueOf(total / 3600).split("\\.")[1]) * 60);
+
+            String rawDataStr = String.valueOf(obj2);
+
+            if (obj2 >= 0 && obj2 <= 9) {
+                rawDataStr = "0" + rawDataStr;
+            }
+            return "Всего за месяц: " + (int) Math.floor(total / 3600) + ":" + rawDataStr;
+        }else{
+            return "Всего за месяц: ";
+        }
     }
 
     public static void main(String[] args) throws SQLException {
