@@ -49,10 +49,18 @@ public class TimeTrackingApp extends Application {
         TableColumn<WorkEntity, String> totalColumn = new TableColumn<>("Всего");
         totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalProperty());
 
+        TableColumn<WorkEntity, String> pathColumn = new TableColumn<>("Маршрут");
+        pathColumn.setCellValueFactory(cellData -> cellData.getValue().pathProperty());
+
+        TableColumn<WorkEntity, String> exitColumn = new TableColumn<>("Выход");
+        exitColumn.setCellValueFactory(cellData -> cellData.getValue().exitProperty());
+
         tableView.getColumns().add(dateColumn);
         tableView.getColumns().add(startColumn);
         tableView.getColumns().add(endColumn);
         tableView.getColumns().add(totalColumn);
+        tableView.getColumns().add(pathColumn);
+        tableView.getColumns().add(exitColumn);
 
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:work_time.db");
@@ -80,11 +88,13 @@ public class TimeTrackingApp extends Application {
                     String startTime = resultSet.getString("start_time");
                     String endTime = resultSet.getString("end_time");
                     String total = resultSet.getString("total");
+                    String path = resultSet.getString("path");
+                    String exit = resultSet.getString("exit");
                     for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
                         System.out.print(resultSet.getMetaData().getColumnName(i) + ": " + resultSet.getString(i) + ", ");
                     }
                     System.out.println();
-                    tableView.getItems().add(new WorkEntity(date, startTime, endTime, total));
+                    tableView.getItems().add(new WorkEntity(date, startTime, endTime, total, path, exit));
                 }
             }
         } catch (SQLException e) {
@@ -109,6 +119,8 @@ public class TimeTrackingApp extends Application {
 
         TextField startTimeField = new TextField();
         TextField endTimeField = new TextField();
+        TextField pathField = new TextField();
+        TextField exitField = new TextField();
 
         // Список для хранения сообщений об ошибках
         final String[] errorMessages1 = new String[1];
@@ -143,14 +155,18 @@ public class TimeTrackingApp extends Application {
         gridPane.add(new Label("Конец:"), 0, 2);
         gridPane.add(endTimeField, 1, 2);
         gridPane.add(datePicker2,2,2);
+        gridPane.add(new Label("Маршрут"), 0,3);
+        gridPane.add(pathField, 1,3);
+        gridPane.add(new Label("Выход"),0,4);
+        gridPane.add(exitField, 1, 4);
 
         Label errorLabel = new Label();
         Label errorLabel0 = new Label();
         errorLabel.setTextFill(Color.RED);
         errorLabel0.setTextFill(Color.RED);
 
-        gridPane.add(errorLabel, 1, 3);
-        gridPane.add(errorLabel0, 1, 4);
+        gridPane.add(errorLabel, 1, 5);
+        gridPane.add(errorLabel0, 1, 6);
 
         Button addButton = new Button("Добавить");
         addButton.setOnAction(event -> {
@@ -179,10 +195,12 @@ public class TimeTrackingApp extends Application {
 
             String startTime = startTimeField.getText();
             String endTime = endTimeField.getText();
+            String path = pathField.getText();
+            String exit = exitField.getText();
 
             String total = calculate(date1,startTime,date2,endTime);
-            WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime, total);
-            AnotherEntity anotherEntity = new AnotherEntity(date,date1,date2, startTime,endTime,total);
+            WorkEntity newWorkEntity = new WorkEntity(date, startTime, endTime, total, path,exit);
+            AnotherEntity anotherEntity = new AnotherEntity(date,date1,date2, startTime,endTime,total, path, exit);
 
             tableView.getItems().add(newWorkEntity);
             try {
@@ -194,9 +212,9 @@ public class TimeTrackingApp extends Application {
             dialogStage.close();
         });
 
-        gridPane.add(addButton, 0, 4, 2, 1);
+        gridPane.add(addButton, 0, 7, 2, 1);
 
-        Scene dialogScene = new Scene(gridPane, 300, 200);
+        Scene dialogScene = new Scene(gridPane, 300, 320);
         dialogStage.setScene(dialogScene);
         dialogStage.show();
     }
@@ -251,16 +269,18 @@ public class TimeTrackingApp extends Application {
         });
     }
     private void deleteDataFromDB(WorkEntity workEntity) throws SQLException {
-        String sql = "DELETE FROM work_entries WHERE date = ? AND start_time = ? AND end_time = ?";
+        String sql = "DELETE FROM work_entries WHERE date = ? AND start_time = ? AND end_time = ? AND path = ? AND exit = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, workEntity.getDate().toString());
             preparedStatement.setString(2, workEntity.getStartTime());
             preparedStatement.setString(3, workEntity.getEndTime());
+            preparedStatement.setString(4,workEntity.getPath());
+            preparedStatement.setString(5,workEntity.getExit());
             preparedStatement.executeUpdate();
         }
     }
     private void insertDataIntoDB(AnotherEntity workEntity) throws SQLException {
-        String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time, total) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time, total, path, exit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             // Проверяем, что дата не null, перед вызовом toString()
             if(AnotherEntity.getDate() != null){
@@ -283,6 +303,8 @@ public class TimeTrackingApp extends Application {
             preparedStatement.setString(4, workEntity.getStartTime());
             preparedStatement.setString(5, workEntity.getEndTime());
             preparedStatement.setString(6,workEntity.getTotal());
+            preparedStatement.setString(7,workEntity.getPath());
+            preparedStatement.setString(8,workEntity.getExit());
             preparedStatement.executeUpdate();
         }
     }
@@ -296,7 +318,9 @@ public class TimeTrackingApp extends Application {
                 "date2 TEXT," +
                 "start_time TEXT," +
                 "end_time TEXT,"+
-                "total TEXT)";
+                "total TEXT,"+
+                "path TEXT,"+
+                "exit TEXT)";
         statement.executeUpdate(sql);
     }
 

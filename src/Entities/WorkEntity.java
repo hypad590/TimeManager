@@ -1,5 +1,6 @@
 package Entities;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -10,13 +11,40 @@ public class WorkEntity {
     private final SimpleStringProperty startTime;
     private final SimpleStringProperty endTime;
     private final SimpleStringProperty total;
+    private final SimpleStringProperty exit;
+    private final SimpleStringProperty path;
+
     public WorkEntity(
-            LocalDate date, String startTime,String endTime,String total
+            LocalDate date, String startTime,String endTime,String total,String path, String exit
     ) {
         this.date = new SimpleObjectProperty<>(date);
         this.startTime = new SimpleStringProperty(startTime);
         this.endTime = new SimpleStringProperty(endTime);
         this.total = new SimpleStringProperty(total);
+        this.path = new SimpleStringProperty(path);
+        this.exit = new SimpleStringProperty(exit);
+    }
+    public String getExit() {
+        return exit.get();
+    }
+
+    public SimpleStringProperty exitProperty() {
+        return exit;
+    }
+
+    public void setExit(String exit) {
+        this.exit.set(exit);
+    }
+    public String getPath() {
+        return path.get();
+    }
+
+    public SimpleStringProperty pathProperty() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path.set(path);
     }
     public String getTotal() {
         return total.get();

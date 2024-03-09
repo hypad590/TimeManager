@@ -1,5 +1,6 @@
 package Entities;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -12,8 +13,12 @@ public class AnotherEntity{
     private final SimpleStringProperty endTime;
     private static  SimpleObjectProperty<LocalDate> date2 = null;
     private final SimpleStringProperty total;
+    private final SimpleStringProperty exit;
+    private final SimpleStringProperty path;
 
-    public AnotherEntity(LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime, String total) {
+    public AnotherEntity(
+            LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime, String total,String path,
+            String exit) {
 
         this.date = new SimpleObjectProperty<>(date);
         AnotherEntity.date1 = new SimpleObjectProperty<>(date1);
@@ -21,8 +26,33 @@ public class AnotherEntity{
         this.startTime = new SimpleStringProperty(startTime);
         this.endTime = new SimpleStringProperty(endTime);
         this.total = new SimpleStringProperty(total);
+        this.path = new SimpleStringProperty(path);
+        this.exit = new SimpleStringProperty(exit);
 
     }
+    public String getExit() {
+        return exit.get();
+    }
+
+    public SimpleStringProperty exitProperty() {
+        return exit;
+    }
+
+    public void setExit(String exit) {
+        this.exit.set(exit);
+    }
+    public String getPath() {
+        return path.get();
+    }
+
+    public SimpleStringProperty pathProperty() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path.set(path);
+    }
+
     public String getTotal() {
         return total.get();
     }
