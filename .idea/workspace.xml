@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="WorkersInfo:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9922e559-0f14-4435-a082-2bd351aee2f2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/WorkersInfo_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/WorkersInfo_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" afterPath="$PROJECT_DIR$/work_time.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +37,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

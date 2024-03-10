@@ -36,21 +36,22 @@ public class TimeTrackingApp extends Application {
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setTitle("Учет рабочего времени");
 
-        Button addEmpl = new Button("Добавить сотрудника");
+        Button addEmpl = new Button("Добавить");
         addEmpl.setOnAction(event -> showAddEmplDialog());
+
+        Button archiveButton = new Button("Архив");
+        archiveButton.setOnAction(event -> showArchiveDialog());
+
+        VBox btnsBox = new VBox(addEmpl,archiveButton);
+        btnsBox.setSpacing(10);
+
+        root.setLeft(btnsBox);
 
         tableView = new TableView<>();
         tableView.setEditable(true);
 
-        root.setTop(addEmpl);
-        root.setCenter(tableView);
-
         totalLabel = new Label();
         root.setBottom(totalLabel);
-
-        Button archiveButton = new Button("Архив");
-        archiveButton.setOnAction(event -> showArchiveDialog());
-        root.setRight(archiveButton);
 
         TableColumn<WorkEntity, LocalDate> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -369,7 +370,7 @@ public class TimeTrackingApp extends Application {
     private void showArchiveDialog() {
         Stage dialogStage = new Stage();
         dialogStage.initOwner(primaryStage);
-        dialogStage.setTitle("Выберите месяц");
+        dialogStage.setTitle("");
 
         DatePicker monthPicker = new DatePicker();
 
@@ -385,7 +386,7 @@ public class TimeTrackingApp extends Application {
         });
 
         VBox dialogVBox = new VBox(vbox, selectButton);
-        Scene dialogScene = new Scene(dialogVBox, 300, 200);
+        Scene dialogScene = new Scene(dialogVBox, 175, 150);
         dialogStage.setScene(dialogScene);
         dialogStage.show();
     }
