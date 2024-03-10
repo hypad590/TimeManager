@@ -1,8 +1,8 @@
 package Model;
 
+import Entities.AnotherEntity;
+import Entities.WorkEntity;
 import javafx.application.Application;
-
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,9 +17,7 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import Entities.*;
 
 public class TimeTrackingApp extends Application {
     private static Connection connection;
@@ -38,12 +36,25 @@ public class TimeTrackingApp extends Application {
 
         Button addEmpl = new Button("Добавить");
         addEmpl.setOnAction(event -> showAddEmplDialog());
+        addEmpl.setMinWidth(100);
 
         Button archiveButton = new Button("Архив");
         archiveButton.setOnAction(event -> showArchiveDialog());
+        archiveButton.setMinWidth(100);
 
-        VBox btnsBox = new VBox(addEmpl,archiveButton);
-        btnsBox.setSpacing(10);
+        Button resetBtn = new Button("Вернуться");
+        resetBtn.setOnAction(event -> {
+            try {
+                reset();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        resetBtn.setMinWidth(100);
+
+        VBox btnsBox = new VBox(addEmpl,archiveButton, resetBtn);
+        btnsBox.setSpacing(20);
+        btnsBox.setPadding(new Insets(10));
 
         root.setLeft(btnsBox);
 
@@ -322,6 +333,10 @@ public class TimeTrackingApp extends Application {
             preparedStatement.executeUpdate();
         }
     }
+    private void reset() throws SQLException {
+        tableView.getItems().clear();
+        loadDataFromDB();
+    }
 
     private void createTable() throws SQLException {
         Statement statement = connection.createStatement();
@@ -338,7 +353,6 @@ public class TimeTrackingApp extends Application {
         statement.executeUpdate(sql);
     }
     private static void loadDataFromArchive(String sel){
-        System.out.println(sel);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try (Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM work_entries")) {
@@ -347,8 +361,8 @@ public class TimeTrackingApp extends Application {
                 String dateString = resultSet.getString("date");
                 if (dateString != null) {
                     LocalDate date = LocalDate.parse(dateString, formatter);
-                    String[] huy = String.valueOf(date).split("-");
-                    String[] huy2 = String.valueOf(sel).split("-");
+                    String[] s = String.valueOf(date).split("-");
+                    String[] s2 = String.valueOf(sel).split("-");
 
                     String startTime = resultSet.getString("start_time");
                     String endTime = resultSet.getString("end_time");
@@ -357,7 +371,7 @@ public class TimeTrackingApp extends Application {
                     String exit = resultSet.getString("exit");
 
 
-                    if((huy[0] + huy[1]).equals(huy2[0] + huy2[1])){
+                    if((s[0] + s[1]).equals(s2[0] + s2[1])){
                         tableView.getItems().add(new WorkEntity(date, startTime, endTime, total, path, exit));
                     }
                 }
