@@ -16,8 +16,10 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.Logger;
 
 public class TimeTrackingApp extends Application {
+    private static final Logger logger = Logger.getLogger(TimeTrackingApp.class.getName());
     private static Connection connection;
     private static TableView<WorkEntity> tableView;
     private ContextMenu currentContextMenu = null;
@@ -26,7 +28,6 @@ public class TimeTrackingApp extends Application {
     private static Stage primaryStage;
     private static LocalDate selectedDate;
     public static void main(String[] args) throws SQLException {
-        System.setProperty("javafx.home", "C:\\Users\\aloxa\\Downloads\\openjfx-17.0.10_windows-x64_bin-sdk\\javafx-sdk-17.0.10");
         launch(args);
         loadDataFromDB();
     }
@@ -120,6 +121,10 @@ public class TimeTrackingApp extends Application {
         setupContextMenu();
         primaryStage.setScene(scene);
         primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> {
+            logger.info("App closed");
+        });
+        logger.info("App started");
     }
 
     private static void loadDataFromDB() throws SQLException {
@@ -136,6 +141,7 @@ public class TimeTrackingApp extends Application {
                     String path = resultSet.getString("path");
                     String exit = resultSet.getString("exit");
                     tableView.getItems().add(new WorkEntity(date, startTime, endTime, total, path, exit));
+                    logger.info("Data loaded");
                 }
             }
         } catch (SQLException e) {
@@ -260,6 +266,7 @@ public class TimeTrackingApp extends Application {
         Scene dialogScene = new Scene(gridPane, 300, 320);
         dialogStage.setScene(dialogScene);
         dialogStage.show();
+        logger.info("DialogShowed");
     }
     private String calculate(LocalDate date1, String startTime, LocalDate date2, String endTime){
         long startUnix = date1.toEpochDay() * 86400 + LocalTime.parse(startTime).toSecondOfDay();
@@ -329,6 +336,7 @@ public class TimeTrackingApp extends Application {
             preparedStatement.setString(5,workEntity.getExit());
             preparedStatement.executeUpdate();
         }
+        logger.info("Deleted");
     }
     private void insertDataIntoDB(AnotherEntity workEntity) throws SQLException {
         String sql = "INSERT INTO work_entries (date, date1, date2, start_time, end_time, total, path, exit) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -343,6 +351,7 @@ public class TimeTrackingApp extends Application {
             preparedStatement.setString(8,workEntity.getExit());
             preparedStatement.executeUpdate();
         }
+        logger.info("Inserted");
     }
     private void reset() throws SQLException {
         tableView.getItems().clear();
@@ -362,6 +371,7 @@ public class TimeTrackingApp extends Application {
                 "path TEXT,"+
                 "exit TEXT)";
         statement.executeUpdate(sql);
+        logger.info("Table created");
     }
     private static void loadDataFromArchive(String sel){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");

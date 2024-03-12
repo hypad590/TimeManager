@@ -29,7 +29,7 @@
               <transformers>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>Main</Main-Class>
+                    <Main-Class>com.hypad.main.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
               </transformers>
