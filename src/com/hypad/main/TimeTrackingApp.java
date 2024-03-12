@@ -1,49 +1,63 @@
-package Model;
+package com.hypad.main;
 
 import javafx.application.Application;
-
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Translate;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import Entities.*;
 
 public class TimeTrackingApp extends Application {
     private static Connection connection;
     private static TableView<WorkEntity> tableView;
     private ContextMenu currentContextMenu = null;
     private static Label totalLabel;
-    private static  DatePicker datePicker99;
+    private static DatePicker datePicker99;
     private static Stage primaryStage;
     private static LocalDate selectedDate;
-
+    public static void main(String[] args) throws SQLException {
+        System.setProperty("javafx.home", "C:\\Users\\aloxa\\Downloads\\openjfx-17.0.10_windows-x64_bin-sdk\\javafx-sdk-17.0.10");
+        launch(args);
+        loadDataFromDB();
+    }
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 605, 500);
         primaryStage.setTitle("Учет рабочего времени");
 
         Button addEmpl = new Button("Добавить");
         addEmpl.setOnAction(event -> showAddEmplDialog());
+        addEmpl.setMinWidth(100);
 
         Button archiveButton = new Button("Архив");
         archiveButton.setOnAction(event -> showArchiveDialog());
+        archiveButton.setMinWidth(100);
 
-        VBox btnsBox = new VBox(addEmpl,archiveButton);
-        btnsBox.setSpacing(10);
+        Button resetBtn = new Button("Вернуться");
+        resetBtn.setOnAction(event -> {
+            try {
+                reset();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        resetBtn.setMinWidth(100);
+
+        VBox btnsBox = new VBox(addEmpl, archiveButton, resetBtn);
+        btnsBox.setSpacing(20);
+        btnsBox.setPadding(new Insets(10));
 
         root.setLeft(btnsBox);
 
@@ -51,7 +65,13 @@ public class TimeTrackingApp extends Application {
         tableView.setEditable(true);
 
         totalLabel = new Label();
-        root.setBottom(totalLabel);
+
+        HBox hBox = new HBox(totalLabel);
+        hBox.setAlignment(Pos.BOTTOM_RIGHT);
+        root.setBottom(hBox);
+
+        root.setRight(new Region());
+        root.setPadding(new Insets(10, 10, 10, 0));
 
         TableColumn<WorkEntity, LocalDate> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -90,8 +110,8 @@ public class TimeTrackingApp extends Application {
 
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:work_time.db");
-            loadDataFromDB();
             createTable();
+            loadDataFromDB();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -167,18 +187,18 @@ public class TimeTrackingApp extends Application {
             }
         });
 
-        gridPane.add(new Label("Выберите дату:"), 0, 0);
+        gridPane.add(new Label("Дата"), 0, 0);
         gridPane.add(datePicker, 1, 0);
-        gridPane.add(new Label("Начало:"), 0, 1);
-        gridPane.add(startTimeField, 1, 1);
-        gridPane.add(datePicker1,2,1);
-        gridPane.add(new Label("Конец:"), 0, 2);
-        gridPane.add(endTimeField, 1, 2);
-        gridPane.add(datePicker2,2,2);
-        gridPane.add(new Label("Маршрут"), 0,3);
-        gridPane.add(pathField, 1,3);
-        gridPane.add(new Label("Выход"),0,4);
-        gridPane.add(exitField, 1, 4);
+        gridPane.add(new Label("Начало"), 0, 3);
+        gridPane.add(startTimeField, 1, 3);
+        gridPane.add(datePicker1,2,3);
+        gridPane.add(new Label("Конец"), 0, 4);
+        gridPane.add(endTimeField, 1, 4);
+        gridPane.add(datePicker2,2,4);
+        gridPane.add(new Label("Маршрут"), 0,1);
+        gridPane.add(pathField, 1,1);
+        gridPane.add(new Label("Выход"),0,2);
+        gridPane.add(exitField, 1, 2);
 
         Label errorLabel = new Label();
         Label errorLabel0 = new Label();
@@ -232,7 +252,10 @@ public class TimeTrackingApp extends Application {
             dialogStage.close();
         });
 
-        gridPane.add(addButton, 0, 7, 2, 1);
+        addButton.getTransforms().add(new Translate(105,0));
+        GridPane.setRowIndex(addButton,7);
+        GridPane.setColumnIndex(addButton,2);
+        gridPane.getChildren().add(addButton);
 
         Scene dialogScene = new Scene(gridPane, 300, 320);
         dialogStage.setScene(dialogScene);
@@ -251,7 +274,6 @@ public class TimeTrackingApp extends Application {
         if (obj2 >= 0 && obj2 <= 9) {
             rawDataStr = "0"+rawDataStr;
         }
-
         return (int) Math.floor(rawData / 3600) + ":" + rawDataStr;
     }
     private void setupContextMenu() {
@@ -322,6 +344,10 @@ public class TimeTrackingApp extends Application {
             preparedStatement.executeUpdate();
         }
     }
+    private void reset() throws SQLException {
+        tableView.getItems().clear();
+        loadDataFromDB();
+    }
 
     private void createTable() throws SQLException {
         Statement statement = connection.createStatement();
@@ -338,17 +364,16 @@ public class TimeTrackingApp extends Application {
         statement.executeUpdate(sql);
     }
     private static void loadDataFromArchive(String sel){
-        System.out.println(sel);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         try (Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM work_entries")) {
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM work_entries")) {
             tableView.getItems().clear();
             while (resultSet.next()) {
                 String dateString = resultSet.getString("date");
                 if (dateString != null) {
                     LocalDate date = LocalDate.parse(dateString, formatter);
-                    String[] huy = String.valueOf(date).split("-");
-                    String[] huy2 = String.valueOf(sel).split("-");
+                    String[] s = String.valueOf(date).split("-");
+                    String[] s2 = String.valueOf(sel).split("-");
 
                     String startTime = resultSet.getString("start_time");
                     String endTime = resultSet.getString("end_time");
@@ -357,7 +382,7 @@ public class TimeTrackingApp extends Application {
                     String exit = resultSet.getString("exit");
 
 
-                    if((huy[0] + huy[1]).equals(huy2[0] + huy2[1])){
+                    if((s[0] + s[1]).equals(s2[0] + s2[1])){
                         tableView.getItems().add(new WorkEntity(date, startTime, endTime, total, path, exit));
                     }
                 }
@@ -394,7 +419,10 @@ public class TimeTrackingApp extends Application {
         float total = 0.0f;
         if(!tableView.getItems().isEmpty()){
             for(WorkEntity workEntity : tableView.getItems()) {
-                total += LocalTime.parse(workEntity.getTotal(), DateTimeFormatter.ofPattern("H:mm")).toSecondOfDay();
+                int hours = Integer.parseInt(workEntity.getTotal().split(":")[0]) * 3600;
+                int mins = Integer.parseInt(workEntity.getTotal().split(":")[1]) * 60;
+
+                total += hours + mins;
             }
             int obj2 = (int) (Float.parseFloat("0." + String.valueOf(total / 3600).split("\\.")[1]) * 60);
 
@@ -407,10 +435,5 @@ public class TimeTrackingApp extends Application {
         }else{
             return "Всего за месяц: ";
         }
-    }
-
-    public static void main(String[] args) throws SQLException {
-        launch(args);
-        loadDataFromDB();
     }
 }

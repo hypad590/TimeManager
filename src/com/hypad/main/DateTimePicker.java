@@ -1,4 +1,4 @@
-package Entities;
+package com.hypad.main;
 
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;

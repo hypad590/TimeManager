@@ -1,27 +1,35 @@
-package Entities;
+package com.hypad.main;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class WorkEntity {
-    private final SimpleObjectProperty<LocalDate> date;
+public class AnotherEntity{
+    private static SimpleObjectProperty<LocalDate> date1 = null;
+    private static SimpleObjectProperty<LocalDate> date = null;
     private final SimpleStringProperty startTime;
     private final SimpleStringProperty endTime;
+    private static  SimpleObjectProperty<LocalDate> date2 = null;
     private final SimpleStringProperty total;
     private final SimpleStringProperty exit;
     private final SimpleStringProperty path;
 
-    public WorkEntity(LocalDate date, String startTime, String endTime, String total, String path, String exit) {
-        this.date = new SimpleObjectProperty<>(date);
+    public AnotherEntity(
+            LocalDate date,LocalDate date1, LocalDate date2, String startTime, String endTime, String total,String path,
+            String exit) {
+
+        AnotherEntity.date = new SimpleObjectProperty<>(date);
+        AnotherEntity.date1 = new SimpleObjectProperty<>(date1);
+        AnotherEntity.date2 = new SimpleObjectProperty<>(date2);
         this.startTime = new SimpleStringProperty(startTime);
         this.endTime = new SimpleStringProperty(endTime);
         this.total = new SimpleStringProperty(total);
         this.path = new SimpleStringProperty(path);
         this.exit = new SimpleStringProperty(exit);
-    }
 
+    }
     public String getExit() {
         return exit.get();
     }
@@ -33,7 +41,6 @@ public class WorkEntity {
     public void setExit(String exit) {
         this.exit.set(exit);
     }
-
     public String getPath() {
         return path.get();
     }
@@ -58,13 +65,15 @@ public class WorkEntity {
         this.total.set(total);
     }
 
-    public SimpleObjectProperty<LocalDate> dateProperty() {
-        return date;
+    public static LocalDate getDate1() {
+        return date1.get();
     }
+    public static LocalDate getDate(){return date.get(); }
 
-    public LocalDate getDate() {
-        return date.get();
+    public SimpleObjectProperty<LocalDate> date1Property() {
+        return date1;
     }
+    public SimpleObjectProperty<LocalDate> dateProperty() {return  date;}
 
     public String getStartTime() {
         return startTime.get();
@@ -82,7 +91,15 @@ public class WorkEntity {
         return endTime;
     }
 
-    public String getFormattedDate() {
+    public static LocalDate getDate2() {
+        return date2.get();
+    }
+
+    public SimpleObjectProperty<LocalDate> date2Property() {
+        return date2;
+    }
+    public static String getFormattedDate() {
         return getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
+
 }

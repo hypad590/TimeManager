@@ -10,17 +10,38 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9922e559-0f14-4435-a082-2bd351aee2f2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/JavaFX.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/artifacts/WorkersInfo_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/WorkersInfo_jar.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_fxml_17.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_openjfx_javafx_fxml_win_17.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/WorkersInfo.iml" beforeDir="false" afterPath="$PROJECT_DIR$/WorkersInfo.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entities/AnotherEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/hypad/main/AnotherEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entities/DateTimePicker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/hypad/main/DateTimePicker.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Entities/WorkEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/hypad/main/WorkEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Model/TimeTrackingApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/hypad/main/TimeTrackingApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entities/AnotherEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entities/DateTimePicker.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Entities/WorkEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/TimeTrackingApp.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="module-info" />
+        <option value="JavaFXApplication" />
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,11 +59,67 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "project.structure.last.edited": "Project",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "last_opened_file_path": "C:/Users/aloxa/Downloads/openjfx-17.0.10_windows-x64_bin-sdk/javafx-sdk-17.0.10/bin/vcruntime140_1.dll",
+    "project.structure.last.edited": "Artifacts",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\projects\jav\WorkersInfo\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.com.hypad.main.Main">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Model.Main" />
+      <module name="WorkersInfo" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Model.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TimeTrackingApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Model.TimeTrackingApp" />
+      <module name="WorkersInfo" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\aloxa\Downloads\openjfx-17.0.10_windows-x64_bin-sdk\javafx-sdk-17.0.10\lib&quot; --add-modules javafx.controls,javafx.fxml " />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value=".*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="com.hypad.main.Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.hypad.main.Main" />
+      <module name="WorkersInfo" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.hypad.main.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.com.hypad.main.Main" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.TimeTrackingApp" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
