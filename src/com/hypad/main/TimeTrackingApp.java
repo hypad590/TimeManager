@@ -14,9 +14,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Logger;
 
@@ -191,7 +189,7 @@ public class TimeTrackingApp extends Application {
                 errorMessages1[0] = "";
             }
             else{
-                errorMessages1[0] = "Invalid Start Time Format";
+                errorMessages1[0] = "Неверный формат для поля Начало";
             }
         });
 
@@ -201,7 +199,7 @@ public class TimeTrackingApp extends Application {
                 errorMessages2[0] = "";
             }
             else{
-                errorMessages2[0] = "Invalid End Time Format";
+                errorMessages2[0] = "Неверный формат для поля Конец";
             }
         });
 
@@ -231,16 +229,16 @@ public class TimeTrackingApp extends Application {
             LocalDate date = datePicker.getValue(); LocalDate date1 = datePicker1.getValue();
             LocalDate date2 = datePicker2.getValue();
             if (date == null) {
-                errorLabel.setText("Invalid Data");
+                errorLabel.setText("Неверные данные");
                 return;
             }
 
             if(errorMessages1[0] == null || errorMessages2[0] == null){
                 if(errorMessages1[0] == null){
-                    errorLabel.setText("Invalid Start Time format");
+                    errorLabel.setText("Неверный формат для поля Начало");
                 }
                 if(errorMessages2[0] == null){
-                    errorLabel0.setText("Invalid End Time format");
+                    errorLabel0.setText("Неверный формат для поля Конец");
                 }
                 return;
             }
@@ -451,22 +449,33 @@ public class TimeTrackingApp extends Application {
         dialogStage.setScene(dialogScene);
         dialogStage.show();
     }
-    private static String totalSum(){
-        long totalMinutes = 0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        for(WorkEntity workEntity : tableView.getItems()) {
+    private static String totalSum() {
+        Duration totalDuration = Duration.ZERO;
+
+        for (WorkEntity workEntity : tableView.getItems()) {
             String startTime = workEntity.getStartTime();
             String endTime = workEntity.getEndTime();
+
             LocalDate date1 = workEntity.getDate();
             LocalDate date2 = workEntity.getDate();
-            String total = calculate(date1, startTime, date2, endTime);
-            int hours = Integer.parseInt(total.split(":")[0]);
-            int minutes = Integer.parseInt(total.split(":")[1]);
-            totalMinutes += hours * 60 + minutes;
+
+            LocalTime start = LocalTime.parse(startTime);
+            LocalTime end = LocalTime.parse(endTime);
+
+            LocalDateTime startDateTime = LocalDateTime.of(date1, start);
+            LocalDateTime endDateTime = LocalDateTime.of(date2, end);
+
+            if (start.isAfter(end)) {
+                endDateTime = endDateTime.plusDays(1);
+            }
+
+            Duration duration = Duration.between(startDateTime, endDateTime);
+
+            totalDuration = totalDuration.plus(duration);
         }
 
-        long totalHours = totalMinutes / 60;
-        long remainingMinutes = totalMinutes % 60;
+        long totalHours = totalDuration.toHours();
+        long remainingMinutes = totalDuration.toMinutesPart();
 
         return String.format("Всего за месяц: %02d:%02d", totalHours, remainingMinutes);
     }

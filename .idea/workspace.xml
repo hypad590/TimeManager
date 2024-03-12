@@ -10,7 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9922e559-0f14-4435-a082-2bd351aee2f2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/hypad/main/TimeTrackingApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/hypad/main/TimeTrackingApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/work_time.db" beforeDir="false" afterPath="$PROJECT_DIR$/work_time.db" afterDir="false" />
     </list>
