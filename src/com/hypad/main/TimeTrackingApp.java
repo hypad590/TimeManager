@@ -1,6 +1,7 @@
 package com.hypad.main;
 
 import javafx.application.Application;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Logger;
 
@@ -27,15 +29,17 @@ public class TimeTrackingApp extends Application {
     private static DatePicker datePicker99;
     private static Stage primaryStage;
     private static LocalDate selectedDate;
+
     public static void main(String[] args) throws SQLException {
         launch(args);
         loadDataFromDB();
     }
+
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-        BorderPane root = new BorderPane();
-        Scene scene = new Scene(root, 605, 500);
+        GridPane root = new GridPane();
+        Scene scene = new Scene(root, 750, 500);
         primaryStage.setTitle("Учет рабочего времени");
 
         Button addEmpl = new Button("Добавить");
@@ -60,19 +64,19 @@ public class TimeTrackingApp extends Application {
         btnsBox.setSpacing(20);
         btnsBox.setPadding(new Insets(10));
 
-        root.setLeft(btnsBox);
+        root.add(btnsBox, 0, 0);
 
         tableView = new TableView<>();
         tableView.setEditable(true);
 
+        GridPane.setColumnSpan(tableView, GridPane.REMAINING);
+        GridPane.setMargin(tableView, new Insets(10));
+
         totalLabel = new Label();
+        root.add(totalLabel, 1, 1);
+        GridPane.setHalignment(totalLabel, HPos.RIGHT);
+        GridPane.setMargin(totalLabel, new Insets(10));
 
-        HBox hBox = new HBox(totalLabel);
-        hBox.setAlignment(Pos.BOTTOM_RIGHT);
-        root.setBottom(hBox);
-
-        root.setRight(new Region());
-        root.setPadding(new Insets(10, 10, 10, 0));
 
         TableColumn<WorkEntity, LocalDate> dateColumn = new TableColumn<>("Дата");
         dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -109,6 +113,14 @@ public class TimeTrackingApp extends Application {
         tableView.getColumns().add(pathColumn);
         tableView.getColumns().add(exitColumn);
 
+        double width = 100.0; // Примерная ширина каждого столбца
+        dateColumn.setPrefWidth(width);
+        startColumn.setPrefWidth(width);
+        endColumn.setPrefWidth(width);
+        totalColumn.setPrefWidth(width);
+        pathColumn.setPrefWidth(width);
+        exitColumn.setPrefWidth(width);
+
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:work_time.db");
             createTable();
@@ -116,7 +128,7 @@ public class TimeTrackingApp extends Application {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        root.setCenter(tableView);
+        root.add(tableView, 1, 0);
 
         setupContextMenu();
         primaryStage.setScene(scene);
@@ -268,20 +280,26 @@ public class TimeTrackingApp extends Application {
         dialogStage.show();
         logger.info("DialogShowed");
     }
-    private String calculate(LocalDate date1, String startTime, LocalDate date2, String endTime){
-        long startUnix = date1.toEpochDay() * 86400 + LocalTime.parse(startTime).toSecondOfDay();
-        long endUnix = date2.toEpochDay() * 86400 + LocalTime.parse(endTime).toSecondOfDay();
+    private static String calculate(LocalDate date1, String startTime, LocalDate date2, String endTime){
+        long startUnix = date1.atTime(LocalTime.parse(startTime)).toEpochSecond(ZoneOffset.UTC);
+        long endUnix = date2.atTime(LocalTime.parse(endTime)).toEpochSecond(ZoneOffset.UTC);
 
-        float rawData = Math.abs(endUnix - startUnix);
+        long rawData = Math.abs(endUnix - startUnix);
 
-        int obj2 = (int) (Float.parseFloat("0."+String.valueOf(rawData/3600).split("\\.")[1]) * 60);
+        long hours = rawData / 3600;
+        long minutes = (rawData % 3600) / 60;
 
-        String rawDataStr = String.valueOf(obj2);
+        String hoursStr = String.valueOf(hours);
+        String minutesStr = String.valueOf(minutes);
 
-        if (obj2 >= 0 && obj2 <= 9) {
-            rawDataStr = "0"+rawDataStr;
+        if (hours < 10) {
+            hoursStr = "0" + hoursStr;
         }
-        return (int) Math.floor(rawData / 3600) + ":" + rawDataStr;
+        if (minutes < 10) {
+            minutesStr = "0" + minutesStr;
+        }
+
+        return hoursStr + ":" + minutesStr;
     }
     private void setupContextMenu() {
         tableView.setRowFactory(tableView -> {
@@ -409,7 +427,11 @@ public class TimeTrackingApp extends Application {
 
         DatePicker monthPicker = new DatePicker();
 
-        VBox vbox = new VBox(monthPicker);
+        // Устанавливаем отступы вокруг поля выбора даты
+        HBox.setMargin(monthPicker, new Insets(10));
+
+        HBox hbox = new HBox(monthPicker);
+        hbox.setPadding(new Insets(10));
 
         Button selectButton = new Button("Выбрать");
         selectButton.setOnAction(event -> {
@@ -420,30 +442,32 @@ public class TimeTrackingApp extends Application {
             dialogStage.close();
         });
 
-        VBox dialogVBox = new VBox(vbox, selectButton);
-        Scene dialogScene = new Scene(dialogVBox, 175, 150);
+        // Устанавливаем отступы вокруг кнопки
+        HBox.setMargin(selectButton, new Insets(10));
+
+        hbox.getChildren().add(selectButton);
+
+        Scene dialogScene = new Scene(hbox, 300, 150);
         dialogStage.setScene(dialogScene);
         dialogStage.show();
     }
     private static String totalSum(){
-        float total = 0.0f;
-        if(!tableView.getItems().isEmpty()){
-            for(WorkEntity workEntity : tableView.getItems()) {
-                int hours = Integer.parseInt(workEntity.getTotal().split(":")[0]) * 3600;
-                int mins = Integer.parseInt(workEntity.getTotal().split(":")[1]) * 60;
-
-                total += hours + mins;
-            }
-            int obj2 = (int) (Float.parseFloat("0." + String.valueOf(total / 3600).split("\\.")[1]) * 60);
-
-            String rawDataStr = String.valueOf(obj2);
-
-            if (obj2 >= 0 && obj2 <= 9) {
-                rawDataStr = "0" + rawDataStr;
-            }
-            return "Всего за месяц: " + (int) Math.floor(total / 3600) + ":" + rawDataStr;
-        }else{
-            return "Всего за месяц: ";
+        long totalMinutes = 0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        for(WorkEntity workEntity : tableView.getItems()) {
+            String startTime = workEntity.getStartTime();
+            String endTime = workEntity.getEndTime();
+            LocalDate date1 = workEntity.getDate();
+            LocalDate date2 = workEntity.getDate();
+            String total = calculate(date1, startTime, date2, endTime);
+            int hours = Integer.parseInt(total.split(":")[0]);
+            int minutes = Integer.parseInt(total.split(":")[1]);
+            totalMinutes += hours * 60 + minutes;
         }
+
+        long totalHours = totalMinutes / 60;
+        long remainingMinutes = totalMinutes % 60;
+
+        return String.format("Всего за месяц: %02d:%02d", totalHours, remainingMinutes);
     }
 }
